@@ -213,9 +213,9 @@ func (s *Service) CancelBooking(bookingID string, now time.Time) (*booking.Booki
 	if err := b.Cancel(v.CancellationDeadline(), now); err != nil {
 		return nil, err
 	}
-	if b.DepositRefunded {
-		v.ReleaseReefer(b.ContainerCount)
-	}
+	// Cancelling always returns the reefer slots to the voyage's pool so the
+	// capacity can be resold, independent of how the deposit is handled.
+	v.ReleaseReefer(b.ContainerCount)
 	s.store.Save()
 	return b, nil
 }
